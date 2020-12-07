@@ -9,9 +9,9 @@ import SwiftUI
 
 struct CheckoutView: View {
     @ObservedObject var state: AppState
-    @State private var orderConfirmationShown = false
-    @State private var orderConfirmationTitle: LocalizedStringKey = ""
-    @State private var orderConfirmationMessage: LocalizedStringKey = ""
+    @State private var alertShown = false
+    @State private var alertTitle: LocalizedStringKey = ""
+    @State private var alertMessage: LocalizedStringKey = ""
 
     var body: some View {
         GeometryReader { geo in
@@ -34,8 +34,8 @@ struct CheckoutView: View {
         }
         .navigationTitle("Check out")
         .navigationBarTitleDisplayMode(.inline)
-        .alert(isPresented: $orderConfirmationShown) {
-            Alert(title: Text(orderConfirmationTitle), message: Text(orderConfirmationMessage), dismissButton: .default(Text("OK")))
+        .alert(isPresented: $alertShown) {
+            Alert(title: Text(alertTitle), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
     }
 
@@ -51,18 +51,18 @@ struct CheckoutView: View {
         request.httpBody = requestData
 
         URLSession.shared.dataTask(with: request) { responseData, _, error in
-            guard let responseData = responseData,
+            guard error == nil, let responseData = responseData,
                   let decodedOrder = try? JSONDecoder().decode(Order.self, from: responseData) else {
                 print("Unable to decode the response: \(error?.localizedDescription ?? "Unknown error").")
-                orderConfirmationTitle = "Something went wrong :("
-                orderConfirmationMessage = "Unable to place your order. Please check your network and retry."
-                orderConfirmationShown.toggle()
+                alertTitle = "Something went wrong :("
+                alertMessage = "Unable to place your order. Please check your network and retry."
+                alertShown.toggle()
                 return
             }
 
-            orderConfirmationTitle = "Your order is on its way!"
-            orderConfirmationMessage = "You paid $\(decodedOrder.cost, specifier: "%.2f") for \(decodedOrder.quantity) cupcakes."
-            orderConfirmationShown.toggle()
+            alertTitle = "Your order is on its way!"
+            alertMessage = "You paid $\(decodedOrder.cost, specifier: "%.2f") for \(decodedOrder.quantity) cupcakes."
+            alertShown.toggle()
         }.resume()
     }
 }

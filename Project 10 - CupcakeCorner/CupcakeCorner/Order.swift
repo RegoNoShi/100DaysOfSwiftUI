@@ -10,10 +10,6 @@ import Foundation
 struct Order: Codable {
     static let types = ["Vanilla", "Strawberry", "Chocolate", "Rainbow"]
 
-    private enum CodingKeys: CodingKey {
-        case type, quantity, extraFrosting, addSprinkles, name, streetAddress, city, zip
-    }
-
     var type = 0
     var quantity = 3
 
@@ -45,7 +41,11 @@ struct Order: Codable {
         if name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
             streetAddress.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
             city.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
-            zip.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            zip.trimmingCharacters(in: .whitespacesAndNewlines).count < 5 {
+            return false
+        }
+
+        if Int(zip.trimmingCharacters(in: .whitespacesAndNewlines)) == nil {
             return false
         }
 
