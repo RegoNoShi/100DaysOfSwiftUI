@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17511" systemVersion="19H15" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Singer" representedClassName="Singer" syncable="YES">
+        <attribute name="firstName" optional="YES" attributeType="String"/>
+        <attribute name="lastName" optional="YES" attributeType="String"/>
+        <relationship name="sings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Song" inverseName="sungBy" inverseEntity="Song"/>
+    </entity>
+    <entity name="Song" representedClassName="Song" syncable="YES">
+        <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="sungBy" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Singer" inverseName="sings" inverseEntity="Singer"/>
+    </entity>
+    <elements>
+        <element name="Singer" positionX="-63" positionY="-18" width="128" height="88"/>
+        <element name="Song" positionX="-63" positionY="0" width="128" height="73"/>
+    </elements>
+</model>
