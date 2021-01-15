@@ -19,7 +19,7 @@ extension User {
     }
 
     var displayableRegistrationDate: String {
-        dateFormatter.string(from: registered)
+        dateFormatter.string(from: wrappedRegistered)
     }
 
     var displayableActiveState: String {
@@ -28,9 +28,5 @@ extension User {
 
     var displayableShortActiveState: String {
         isActive ? "🟢" : "🔴"
-    }
-
-    var displayableTags: String {
-        tags.map { "#\($0)" }.joined(separator: ", ")
     }
 }

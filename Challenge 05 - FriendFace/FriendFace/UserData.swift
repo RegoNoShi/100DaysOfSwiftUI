@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct User: Codable, Hashable, Identifiable {
+struct UserData: Codable, Hashable, Identifiable {
     let id: String
     let isActive: Bool
     let name: String
@@ -18,10 +18,10 @@ struct User: Codable, Hashable, Identifiable {
     let about: String
     let registered: Date
     let tags: [String]
-    let friends: [Friend]
+    let friends: [FriendData]
 }
 
-struct Friend: Codable, Hashable, Identifiable {
+struct FriendData: Codable, Hashable, Identifiable {
     let id: String
     let name: String
 }

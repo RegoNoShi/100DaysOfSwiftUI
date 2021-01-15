@@ -6,9 +6,12 @@
 //
 
 import SwiftUI
+import CoreData
 
 struct UsersView: View {
+    @Environment(\.managedObjectContext) private var moc
     @StateObject private var model = FriendFaceModel()
+    @State private var appeared = false
 
     var body: some View {
         let errorAlertShown = Binding(
@@ -23,14 +26,13 @@ struct UsersView: View {
                         .progressViewStyle(CircularProgressViewStyle())
                 } else {
                     List(model.users) { user in
-                        NavigationLink(destination: UserDetailsView(user: user,
-                                                                    model: model)) {
+                        NavigationLink(destination: UserDetailsView(user: user, model: model)) {
                             HStack {
                                 VStack(alignment: .leading) {
-                                    Text(user.name)
+                                    Text(user.wrappedName)
                                         .font(.headline)
 
-                                    Text(user.email)
+                                    Text(user.wrappedEmail)
                                         .font(.subheadline)
                                         .foregroundColor(.secondary)
                                 }
@@ -43,6 +45,11 @@ struct UsersView: View {
                         }
                     }
                 }
+            }
+            .onAppear {
+                guard !appeared else { return }
+                appeared = true
+                model.moc = moc
             }
             .navigationTitle("FriendFace")
             .alert(isPresented: errorAlertShown) {
@@ -59,5 +66,6 @@ struct UsersView: View {
 struct UsersView_Previews: PreviewProvider {
     static var previews: some View {
         UsersView()
+            .environment(\.managedObjectContext, previewData.moc)
     }
 }
