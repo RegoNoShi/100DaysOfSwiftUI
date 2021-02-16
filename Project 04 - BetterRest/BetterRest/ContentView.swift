@@ -25,18 +25,21 @@ struct ContentView: View {
             Form {
                 Section(header: Text("When do you want to wake up?")) {
                     DatePicker("Please enter a time", selection: $wakeUp, displayedComponents: .hourAndMinute)
+                        .accessibility(label: /*@START_MENU_TOKEN@*//*@PLACEHOLDER=Text Label@*/Text("Label")/*@END_MENU_TOKEN@*/)
                 }
 
                 Section(header: Text("Desired amount of sleep")) {
                     Stepper(value: $sleepAmount, in: 4...12, step: 0.25) {
                         Text("\(sleepAmount, specifier: "%g") hours")
                     }
+                    .accessibility(label: Text("\(sleepAmount, specifier: "%g") hours"))
                 }
 
                 Section(header: Text("Daily coffee intake")) {
                     Stepper(value: $coffeeAmount, in: 0...20) {
                         Text("\(coffeeAmount) \(coffeeAmount == 1 ? "cup" : "cups")")
                     }
+                    .accessibility(label: Text("\(coffeeAmount) \(coffeeAmount == 1 ? "cup" : "cups")"))
                 }
 
                 Section(header: Text("Your ideal bedtime is…")) {
