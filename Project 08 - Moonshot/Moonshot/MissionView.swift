@@ -7,61 +7,92 @@
 
 import SwiftUI
 
+private struct ResizeWhileScrolling: ViewModifier {
+    var padding: CGFloat
+    var maxPadding: CGFloat
+    
+    private var actualPadding: CGFloat {
+        min(maxPadding, padding)
+    }
+    
+    func body(content: Content) -> some View {
+        content
+            .padding(.top, actualPadding)
+            .padding(.horizontal, actualPadding / 2)
+    }
+}
+
+private extension View {
+    func resizeWhileScrolling(padding: CGFloat = 0, maxPadding: CGFloat = 50) -> some View {
+        modifier(ResizeWhileScrolling(padding: padding, maxPadding: maxPadding))
+    }
+}
+
 struct MissionView: View {
+    private static let paddingTop: CGFloat = 10
     let mission: Mission
+    
+    @State private var offset = CGFloat.zero
 
     var body: some View {
-        GeometryReader { geometry in
-            ScrollView(.vertical) {
-                Image(mission.image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: geometry.size.width * 0.7)
-                    .padding(.top)
-
-                Text("Launch date: \(mission.formattedLaunchDate)")
-                    .padding()
-
-                Text(mission.description)
-                    .padding()
-                    .layoutPriority(1)
-
-                VStack(alignment: .leading) {
-                    Text("Crew members:")
-                        .font(.title)
+        VStack {
+            GeometryReader { fullView in
+                ScrollView(.vertical) {
+                    GeometryReader { geo in
+                        Image(mission.image)
+                            .resizable()
+                            .scaledToFit()
+                            .resizeWhileScrolling(padding: -(geo.frame(in: .named("ScrollViewCS")).minY - MissionView.paddingTop),
+                                                  maxPadding: min(fullView.size.width, fullView.size.height) / 2)
+                    }
+                    .frame(width: fullView.size.width * 0.7, height: fullView.size.width * 0.7)
+                    .padding(.top, MissionView.paddingTop)
+                    
+                    Text("Launch date: \(mission.formattedLaunchDate)")
                         .padding()
 
-                    ForEach(mission.crewMembers) { member in
-                        NavigationLink(destination: AstronautView(astronaut: member.astronaut)) {
-                            HStack {
-                                Image(member.astronaut.id)
-                                    .resizable()
-                                    .frame(width: 83, height: 60)
-                                    .clipShape(Capsule())
-                                    .overlay(Capsule().stroke(Color.primary, lineWidth: 1))
+                    Text(mission.description)
+                        .padding()
+                        .layoutPriority(1)
 
-                                VStack(alignment: .leading) {
-                                    Text(member.astronaut.name)
-                                        .font(.headline)
+                    VStack(alignment: .leading) {
+                        Text("Crew members:")
+                            .font(.title)
+                            .padding()
 
-                                    Text(member.role)
-                                        .foregroundColor(.secondary)
+                        ForEach(mission.crewMembers) { member in
+                            NavigationLink(destination: AstronautView(astronaut: member.astronaut)) {
+                                HStack {
+                                    Image(member.astronaut.id)
+                                        .resizable()
+                                        .frame(width: 83, height: 60)
+                                        .clipShape(Capsule())
+                                        .overlay(Capsule().stroke(Color.primary, lineWidth: 1))
+
+                                    VStack(alignment: .leading) {
+                                        Text(member.astronaut.name)
+                                            .font(.headline)
+
+                                        Text(member.role)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    .padding(.leading)
+
+                                    Spacer()
                                 }
-                                .padding(.leading)
-
-                                Spacer()
+                                .padding(.horizontal)
                             }
-                            .padding(.horizontal)
+                            .buttonStyle(PlainButtonStyle())
                         }
-                        .buttonStyle(PlainButtonStyle())
+
+                        Spacer()
                     }
                 }
-
-                Spacer()
+                .coordinateSpace(name: "ScrollViewCS")
             }
-            .navigationTitle(mission.displayName)
-            .navigationBarTitleDisplayMode(.inline)
         }
+        .navigationTitle(mission.displayName)
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
