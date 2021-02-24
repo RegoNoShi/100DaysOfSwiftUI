@@ -16,6 +16,14 @@ struct ContentView: View {
     @State private var showAlert = false
     @State private var score = 0
     @State private var time = 10
+    
+    private func drift(for geo: GeometryProxy) -> CGFloat {
+        max(geo.frame(in: .global).minY - 900 + geo.size.width, 0)
+    }
+    
+    private func color(for position: CGFloat, in size: CGFloat) -> Color {
+        Color(hue: 1.5 - Double(position / size), saturation: 1, brightness: 1)
+    }
 
     var body: some View {
         NavigationView {
@@ -24,24 +32,32 @@ struct ContentView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .autocapitalization(.none)
                     .padding()
-
-                List(usedWords, id: \.self) { word in
-                    HStack {
-                        Image(systemName: "\(word.count).circle")
-                        Text(word)
+                
+                GeometryReader { fullList in
+                    List(usedWords.indices, id: \.self) { index in
+                        GeometryReader { geo in
+                            HStack {
+                                Image(systemName: "\(usedWords[index].count).circle")
+                                    .foregroundColor(color(for: geo.frame(in: .global).minY,
+                                                           in: fullList.frame(in: .global).height))
+                                
+                                Text(usedWords[index])
+                            }
+                            .offset(x: drift(for: geo))
+                            .accessibilityElement(children: .ignore)
+                            .accessibility(label: Text("\(usedWords[index]), \(usedWords[index].count) letters"))
+                        }
                     }
-                    .accessibilityElement(children: .ignore)
-                    .accessibility(label: Text("\(word), \(word.count) letters"))
                 }
-
+                
                 HStack {
                     Text("Score: \(score)")
                         .font(.title)
 
                     Spacer()
 
-                    Text("Time: \(time)")
-                        .font(.title)
+//                    Text("Time: \(time)")
+//                        .font(.title)
                 }
                 .padding()
             }
@@ -71,6 +87,7 @@ struct ContentView: View {
         rootWord = word
         newWord = ""
         usedWords.removeAll()
+        usedWords = Array(0...100).map { "Row \($0)" }
         score = 0
         time = 60
 
