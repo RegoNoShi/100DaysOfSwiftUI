@@ -10,12 +10,14 @@ import CoreHaptics
 
 struct Roll: Codable {
     let dice: [Int]
-    let number: Int
+    let numberOfFaces: Int
+    let id: Int
     let time: Date
     
-    init(dice: [Int], number: Int, time: Date = Date()) {
+    init(dice: [Int], numberOfFaces: Int, id: Int, time: Date = Date()) {
         self.dice = dice
-        self.number = number
+        self.numberOfFaces = numberOfFaces
+        self.id = id
         self.time = time
     }
     
@@ -28,7 +30,7 @@ class DiceRollerModel: ObservableObject {
     private let historyUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("history.json")
     private var engine: CHHapticEngine?
     private var internalDice = [Int]()
-    private(set) var rollCount: Int = 0
+    private var rollId: Int = 0
     private(set) var numberOfDice: Int = 1
     private(set) var numberOfFaces: Int = 6
     private(set) var rolls = [Roll]() {
@@ -36,14 +38,18 @@ class DiceRollerModel: ObservableObject {
             save()
         }
     }
-    
+        
     init() {
         load()
         prepareHaptics()
     }
-    
+        
     func roll(withFeedback feedbackEnabled: Bool = true) {
         objectWillChange.send()
+        
+        for i in internalDice.indices {
+            internalDice[i] = 0
+        }
         
         if numberOfDice > internalDice.count {
             internalDice.append(contentsOf: Array(repeating: -1, count: numberOfDice - internalDice.count))
@@ -54,8 +60,8 @@ class DiceRollerModel: ObservableObject {
             internalDice[i] = Int.random(in: 1 ... numberOfFaces)
         }
 
-        rollCount += 1
-        rolls.insert(Roll(dice: internalDice, number: rollCount), at: 0)
+        rollId += 1
+        rolls.insert(Roll(dice: internalDice, numberOfFaces: numberOfFaces, id: rollId), at: 0)
         
         if feedbackEnabled {
             rollFeedback()
@@ -79,7 +85,7 @@ class DiceRollerModel: ObservableObject {
         objectWillChange.send()
         
         rolls.removeAll()
-        rollCount = 0
+        rollId = 0
     }
     
     private func load() {
@@ -98,7 +104,7 @@ class DiceRollerModel: ObservableObject {
         if let data = try? Data(contentsOf: historyUrl),
            let rolls = try? JSONDecoder().decode([Roll].self, from: data) {
             self.rolls = rolls
-            rollCount = rolls.count
+            rollId = rolls.count
         }
     }
     

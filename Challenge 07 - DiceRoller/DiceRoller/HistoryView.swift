@@ -24,7 +24,7 @@ struct HistoryView: View {
                         .padding()
                 } else {
                     List {
-                        ForEach(model.rolls, id: \.number) { roll in
+                        ForEach(model.rolls, id: \.id) { roll in
                             ZStack {
                                 RoundedRectangle(cornerRadius: 5)
                                     .fill(Color.green)
@@ -39,7 +39,7 @@ struct HistoryView: View {
                                     }
                                     
                                     GridView(items: roll.dice) { dice in
-                                        DiceView(dice: dice)
+                                        DiceView(dice: dice, rollId: roll.id, maxValue: roll.numberOfFaces)
                                             .padding(2)
                                     }
                                     .frame(height: 75 + CGFloat(roll.dice.count / 5) * 75)
@@ -54,9 +54,8 @@ struct HistoryView: View {
                                         
                                         Image(systemName: "number")
                                         
-                                        Text("\(roll.number)")
+                                        Text("\(roll.id)")
                                     }
-                                    .padding(.top)
                                 }
                                 .foregroundColor(.white)
                                 .padding()

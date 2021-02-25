@@ -20,7 +20,7 @@ struct RollView: View {
                 VStack {
                     if let roll = model.rolls.first {
                         GridView(items: roll.dice) { dice in
-                            DiceView(dice: dice)
+                            DiceView(dice: dice, rollId: roll.id, maxValue: model.numberOfFaces, animated: true)
                                 .padding(4)
                         }
                         .padding()
