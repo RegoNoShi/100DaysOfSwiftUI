@@ -10,9 +10,9 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject private var model: DiceRollerModel
     @Environment(\.presentationMode) private var presentationMode
-
+    
     init() {
-        UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor.black]
+        UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: UIColor.black]
         UINavigationBar.appearance().tintColor = .systemBlue
     }
 
@@ -52,6 +52,10 @@ struct SettingsView: View {
                     }
                 }
             }
+        }
+        .onDisappear() {
+            UINavigationBar.appearance().tintColor = .white
+            UINavigationBar.appearance().titleTextAttributes = [.foregroundColor: UIColor.white]
         }
     }
 }

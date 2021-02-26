@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct MainView: View {
-    private let model = DiceRollerModel()
-    
     var body: some View {
         TabView {
             RollView()
@@ -26,7 +24,6 @@ struct MainView: View {
                     Text("History")
                 }
         }
-        .environmentObject(model)
         .preferredColorScheme(.dark)
     }
 }

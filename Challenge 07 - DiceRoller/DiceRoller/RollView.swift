@@ -18,9 +18,9 @@ struct RollView: View {
                     .edgesIgnoringSafeArea(.all)
                 
                 VStack {
-                    if let roll = model.rolls.first {
-                        GridView(items: roll.dice) { dice in
-                            DiceView(dice: dice, rollId: roll.id, maxValue: model.numberOfFaces, animated: true)
+                    if let roll = model.lastRoll {
+                        GridView(items: roll.wrappedDice) { dice in
+                            DiceView(dice: dice, rollId: Int(roll.id), maxValue: model.numberOfFaces, animated: true)
                                 .padding(4)
                         }
                         .padding()
@@ -37,7 +37,7 @@ struct RollView: View {
                         Spacer()
                         
                         (
-                            Text("No dice rolled yet...\n\nTap ")
+                            Text("Tap ")
                              + Text("Roll")
                                 .italic()
                                 .bold()
@@ -104,6 +104,9 @@ struct RollView: View {
         .onAppear {
             UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor.white]
             UINavigationBar.appearance().tintColor = .white
+        }
+        .onDisappear {
+            model.clearLastRoll()
         }
     }
 }

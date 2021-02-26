@@ -31,24 +31,32 @@ struct HistoryView: View {
                                 
                                 VStack(alignment: .leading) {
                                     HStack {
-                                        Text("Dice: \(roll.dice.count)")
+                                        Text("Dice: \(roll.wrappedDice.count)")
+                                            .multilineTextAlignment(.center)
+                                        
+                                        Spacer()
+                                        
+                                        Text("Faces: \(roll.numberOfFaces)")
+                                            .multilineTextAlignment(.center)
                                         
                                         Spacer()
                                         
                                         Text("Total: \(roll.total)")
+                                            .multilineTextAlignment(.center)
                                     }
                                     
-                                    GridView(items: roll.dice) { dice in
-                                        DiceView(dice: dice, rollId: roll.id, maxValue: roll.numberOfFaces)
+                                    GridView(items: roll.wrappedDice) { dice in
+                                        DiceView(dice: dice, rollId: Int(roll.id), maxValue: Int(roll.numberOfFaces))
                                             .padding(2)
                                     }
-                                    .frame(height: 75 + CGFloat(roll.dice.count / 5) * 75)
+                                    .frame(height: 75 + CGFloat(roll.wrappedDice.count / 5) * 75)
                                     .padding(-2)
+                                    .padding(.vertical)
                                     
                                     HStack {
                                         Image(systemName: "calendar")
                                         
-                                        Text(customDateFormatter.string(from: roll.time))
+                                        Text(customDateFormatter.string(from: roll.wrappedTimestamp))
                                         
                                         Spacer()
                                         

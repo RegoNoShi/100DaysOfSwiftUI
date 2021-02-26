@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct DiceRollerApp: App {
+    @StateObject private var model = DiceRollerModel()
+    
     var body: some Scene {
         WindowGroup {
             MainView()
+                .environmentObject(model)
+                .environment(\.managedObjectContext, model.managedObjectContext)
         }
     }
 }

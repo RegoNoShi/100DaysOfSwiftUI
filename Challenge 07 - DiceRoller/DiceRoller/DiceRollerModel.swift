@@ -5,63 +5,55 @@
 //  Created by Massimo Omodei on 25.02.21.
 //
 
-import Foundation
+import SwiftUI
 import CoreHaptics
-
-struct Roll: Codable {
-    let dice: [Int]
-    let numberOfFaces: Int
-    let id: Int
-    let time: Date
-    
-    init(dice: [Int], numberOfFaces: Int, id: Int, time: Date = Date()) {
-        self.dice = dice
-        self.numberOfFaces = numberOfFaces
-        self.id = id
-        self.time = time
-    }
-    
-    var total: Int {
-        dice.reduce(0, { $0 + $1 })
-    }
-}
+import Combine
+import CoreData
 
 class DiceRollerModel: ObservableObject {
-    private let historyUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("history.json")
-    private var engine: CHHapticEngine?
-    private var internalDice = [Int]()
-    private var rollId: Int = 0
-    private(set) var numberOfDice: Int = 1
-    private(set) var numberOfFaces: Int = 6
-    private(set) var rolls = [Roll]() {
-        didSet {
-            save()
-        }
+    private let persistentContainer: NSPersistentContainer
+    private let engine = DiceRollerModel.prepareHapticEngine()
+    private var cancellableSet: Set<AnyCancellable> = []
+
+    @Published private(set) var numberOfDice: Int = 1
+    @Published private(set) var numberOfFaces: Int = 6
+    @Published private(set) var lastRoll: Roll?
+    @Published var rolls = [Roll]()
+    
+    var managedObjectContext: NSManagedObjectContext {
+        persistentContainer.viewContext
     }
-        
+
     init() {
-        load()
-        prepareHaptics()
+        persistentContainer = NSPersistentContainer(name: "DiceRoller")
+        
+        persistentContainer.loadPersistentStores(completionHandler: { storeDescription, error in
+            if let error = error as NSError? {
+                fatalError("Unresolved error \(error), \(error.userInfo)")
+            }
+        })
+        
+        CoreDataPublisher(request: Roll.fetchAllByTimestampDesc(), context: managedObjectContext)
+            .receive(on: DispatchQueue.main)
+            .sink(
+                receiveCompletion: { _ in },
+                receiveValue: { [weak self] rolls in
+                    self?.rolls = rolls
+                })
+            .store(in: &cancellableSet)
+        
+        loadSettings()
     }
         
     func roll(withFeedback feedbackEnabled: Bool = true) {
-        objectWillChange.send()
+        let roll = Roll(context: managedObjectContext)
+        roll.dice = (0 ..< numberOfDice).map { _ in "\(Int.random(in: 1 ... numberOfFaces))" }.joined(separator: ",")
+        roll.id = Int64(rolls.count + 1)
+        roll.timestamp = Date()
+        roll.numberOfFaces = Int64(numberOfFaces)
+        saveContext()
         
-        for i in internalDice.indices {
-            internalDice[i] = 0
-        }
-        
-        if numberOfDice > internalDice.count {
-            internalDice.append(contentsOf: Array(repeating: -1, count: numberOfDice - internalDice.count))
-        } else if numberOfDice < internalDice.count {
-            internalDice.removeLast(internalDice.count - numberOfDice)
-        }
-        for i in internalDice.indices {
-            internalDice[i] = Int.random(in: 1 ... numberOfFaces)
-        }
-
-        rollId += 1
-        rolls.insert(Roll(dice: internalDice, numberOfFaces: numberOfFaces, id: rollId), at: 0)
+        lastRoll = roll
         
         if feedbackEnabled {
             rollFeedback()
@@ -78,54 +70,50 @@ class DiceRollerModel: ObservableObject {
         self.numberOfDice = numberOfDice ?? self.numberOfDice
         self.numberOfFaces = numberOfFaces ?? self.numberOfFaces
         
-        save()
+        saveSettings()
+    }
+    
+    func clearLastRoll() {
+        objectWillChange.send()
+        
+        lastRoll = nil
     }
     
     func clearHistory() {
-        objectWillChange.send()
-        
-        rolls.removeAll()
-        rollId = 0
+        rolls.forEach {
+            managedObjectContext.delete($0)
+        }
+        saveContext()
     }
     
-    private func load() {
+    private func saveContext() {
+        if managedObjectContext.hasChanges {
+            do {
+                try managedObjectContext.save()
+            } catch {
+                let nserror = error as NSError
+                fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
+            }
+        }
+    }
+    
+    private func loadSettings() {
         numberOfFaces = UserDefaults.standard.integer(forKey: "numberOfFaces")
         if numberOfFaces < 2 {
             numberOfFaces = 6
-            save()
+            saveSettings()
         }
 
         numberOfDice = UserDefaults.standard.integer(forKey: "numberOfDice")
         if numberOfDice < 1 {
             numberOfDice = 1
-            save()
-        }
-        
-        if let data = try? Data(contentsOf: historyUrl),
-           let rolls = try? JSONDecoder().decode([Roll].self, from: data) {
-            self.rolls = rolls
-            rollId = rolls.count
+            saveSettings()
         }
     }
     
-    private func save() {
-        if let data = try? JSONEncoder().encode(rolls) {
-            try? data.write(to: historyUrl)
-        }
-        
+    private func saveSettings() {
         UserDefaults.standard.setValue(numberOfFaces, forKey: "numberOfFaces")
         UserDefaults.standard.setValue(numberOfDice, forKey: "numberOfDice")
-    }
-    
-    private func prepareHaptics() {
-        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return }
-
-        do {
-            engine = try CHHapticEngine()
-            try engine?.start()
-        } catch {
-            print("There was an error creating the engine: \(error.localizedDescription)")
-        }
     }
     
     private func rollFeedback() {
@@ -142,6 +130,19 @@ class DiceRollerModel: ObservableObject {
             try engine.makePlayer(with: pattern).start(atTime: 0)
         } catch {
             print("Failed to play pattern: \(error.localizedDescription).")
+        }
+    }
+    
+    private static func prepareHapticEngine() -> CHHapticEngine? {
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else { return nil }
+
+        do {
+            let engine = try CHHapticEngine()
+            try engine.start()
+            return engine
+        } catch {
+            print("There was an error creating the engine: \(error.localizedDescription)")
+            return nil
         }
     }
 }

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C011082625E85454000D1063 /* DiceRoller.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = C011082425E85454000D1063 /* DiceRoller.xcdatamodeld */; };
+		C011082A25E8568C000D1063 /* Roll+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C011082825E8568C000D1063 /* Roll+CoreDataClass.swift */; };
+		C011082B25E8568C000D1063 /* Roll+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = C011082925E8568C000D1063 /* Roll+CoreDataProperties.swift */; };
+		C011086025E9248A000D1063 /* CoreDataPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = C011085F25E9248A000D1063 /* CoreDataPublisher.swift */; };
 		C0413A6525E7000600073E14 /* DiceRollerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0413A6425E7000600073E14 /* DiceRollerApp.swift */; };
 		C0413A6725E7000600073E14 /* RollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0413A6625E7000600073E14 /* RollView.swift */; };
 		C0413A6925E7000800073E14 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C0413A6825E7000800073E14 /* Assets.xcassets */; };
@@ -21,6 +25,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C011082525E85454000D1063 /* DiceRoller.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = DiceRoller.xcdatamodel; sourceTree = "<group>"; };
+		C011082825E8568C000D1063 /* Roll+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Roll+CoreDataClass.swift"; sourceTree = "<group>"; };
+		C011082925E8568C000D1063 /* Roll+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Roll+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		C011085F25E9248A000D1063 /* CoreDataPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataPublisher.swift; sourceTree = "<group>"; };
 		C0413A6125E7000600073E14 /* DiceRoller.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DiceRoller.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0413A6425E7000600073E14 /* DiceRollerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiceRollerApp.swift; sourceTree = "<group>"; };
 		C0413A6625E7000600073E14 /* RollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollView.swift; sourceTree = "<group>"; };
@@ -71,10 +79,14 @@
 				C0413A6625E7000600073E14 /* RollView.swift */,
 				C0413A8025E79F4700073E14 /* SettingsView.swift */,
 				C0413A8A25E7B74A00073E14 /* HistoryView.swift */,
-				C0413A7425E7001E00073E14 /* DiceView.swift */,
-				C0413A7725E78E2600073E14 /* DiceRollerModel.swift */,
 				C0413A7A25E793BC00073E14 /* GridLayout.swift */,
 				C0413A7D25E7941100073E14 /* GridView.swift */,
+				C0413A7425E7001E00073E14 /* DiceView.swift */,
+				C0413A7725E78E2600073E14 /* DiceRollerModel.swift */,
+				C011085F25E9248A000D1063 /* CoreDataPublisher.swift */,
+				C011082825E8568C000D1063 /* Roll+CoreDataClass.swift */,
+				C011082925E8568C000D1063 /* Roll+CoreDataProperties.swift */,
+				C011082425E85454000D1063 /* DiceRoller.xcdatamodeld */,
 				C0413A6825E7000800073E14 /* Assets.xcassets */,
 				C0413A6D25E7000800073E14 /* Info.plist */,
 				C0413A6A25E7000800073E14 /* Preview Content */,
@@ -159,14 +171,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C011082A25E8568C000D1063 /* Roll+CoreDataClass.swift in Sources */,
 				C0413A8125E79F4700073E14 /* SettingsView.swift in Sources */,
+				C011082B25E8568C000D1063 /* Roll+CoreDataProperties.swift in Sources */,
 				C0413A8725E7B16700073E14 /* MainView.swift in Sources */,
 				C0413A6725E7000600073E14 /* RollView.swift in Sources */,
 				C0413A7525E7001E00073E14 /* DiceView.swift in Sources */,
 				C0413A7B25E793BC00073E14 /* GridLayout.swift in Sources */,
 				C0413A7825E78E2600073E14 /* DiceRollerModel.swift in Sources */,
+				C011082625E85454000D1063 /* DiceRoller.xcdatamodeld in Sources */,
 				C0413A7E25E7941100073E14 /* GridView.swift in Sources */,
 				C0413A8B25E7B74A00073E14 /* HistoryView.swift in Sources */,
+				C011086025E9248A000D1063 /* CoreDataPublisher.swift in Sources */,
 				C0413A6525E7000600073E14 /* DiceRollerApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -356,6 +372,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		C011082425E85454000D1063 /* DiceRoller.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				C011082525E85454000D1063 /* DiceRoller.xcdatamodel */,
+			);
+			currentVersion = C011082525E85454000D1063 /* DiceRoller.xcdatamodel */;
+			path = DiceRoller.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = C0413A5925E7000600073E14 /* Project object */;
 }
